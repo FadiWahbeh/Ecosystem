@@ -1,7 +1,10 @@
 #include "Strategies.h"
-#include "world/world.h"
+#include "world/World.h"
+#include "Interfaces.h"
+#include "world/Cell.h"
 #include <array>
 #include <cstdlib>
+
 
 namespace Ecosystem
 {
@@ -19,13 +22,13 @@ namespace Ecosystem
 	}
 
 	void HerbivoreFeeding::try_feed(class World& world, int x, int y) {
-		auto& cell = world.get_cell(x, y);
+		Cell* cell = world.getCell(x, y);
 		if (!cell) return;
 
 		if (cell->plant && cell->animal) {
 			cell -> plant.reset();
 			cell -> animal->satiety_ref() = world.cfg().satiety_after_eat;
-			cell -> anumal -> hungery_ref() = 0;
+			cell -> animal -> hungery_ref() = 0;
 		}
 	}
 
@@ -45,9 +48,9 @@ namespace Ecosystem
 
 			if (ncell->animal && ncell->animal->kind() == AnimalKind::Herbivore) {
 				ncell->animal.reset();
-				c -> animal -> satietyRef() = world.cfg().satietyAfterEat;
-				c -> animal -> hungerRef() = 0;
-				break
+				c->animal->satiety_ref() = world.cfg().satiety_after_eat;
+				c->animal->hungery_ref() = 0;
+				break;
 			}
 		}
 	}

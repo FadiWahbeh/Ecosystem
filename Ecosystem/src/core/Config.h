@@ -2,13 +2,6 @@
 #include <cstdint>
 
 namespace Ecosystem {
-
-	enum class AnimalKind : uint8_t {
-		None = 0,
-		HERBIVORE = 1,
-		CARNIVOE = 2
-	};
-
 	class Config {
 	
 		public:
