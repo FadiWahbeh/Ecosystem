@@ -3,7 +3,7 @@
 
 namespace Ecosystem {
 	Animal::Animal(AnimalKind k,
-		std::unique_ptr<IMouvementStrategy> m,
+		std::unique_ptr<IMovementStrategy > m,
 		std::unique_ptr<IFeedingStrategy> f) :
 		m_kind(k), m_movement_strategy(std::move(m)), m_feeding_strategy(std::move(f)) { }
 

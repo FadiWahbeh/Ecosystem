@@ -4,12 +4,12 @@
 
 namespace Ecosystem {
 
-	class IMouvementStrategy;
+	class IMovementStrategy;
 	class IFeedingStrategy;
 
 	class Animal : public IAnimal {
 	public :
-		Animal(AnimalKind k, std::unique_ptr<IMouvementStrategy> m, std::unique_ptr<IFeedingStrategy> f);
+		Animal(AnimalKind k, std::unique_ptr<IMovementStrategy> m, std::unique_ptr<IFeedingStrategy> f);
 
 		AnimalKind kind() const override {
 			return m_kind;
@@ -33,7 +33,7 @@ namespace Ecosystem {
 			return m_repro_cooldown;
 		}
 
-		IMouvementStrategy& movement() {
+		IMovementStrategy& movement() {
 			return *m_movement_strategy;
 		}
 
@@ -46,7 +46,7 @@ namespace Ecosystem {
 		int m_hunger = 0;
 		int m_satiety = 0;
 		int m_repro_cooldown = 0;
-		std::unique_ptr<IMouvementStrategy> m_movement_strategy;
+		std::unique_ptr<IMovementStrategy> m_movement_strategy;
 		std::unique_ptr<IFeedingStrategy> m_feeding_strategy;
 	};
 }

@@ -29,10 +29,13 @@ namespace Ecosystem {
 		virtual int& hungery_ref() = 0;
 		virtual int& satiety_ref() = 0;
 		virtual int& repro_cooldown_ref() = 0;
+
+		virtual class IMovementStrategy& movement() = 0;
+		virtual class IFeedingStrategy& feeding() = 0;
 	};
 
-	struct IMouvementStrategy {
-		virtual ~IMouvementStrategy() = default;
+	struct IMovementStrategy {
+		virtual ~IMovementStrategy() = default;
 		virtual Position choose_next(int x, int y) = 0;
 	};
 	struct IFeedingStrategy{

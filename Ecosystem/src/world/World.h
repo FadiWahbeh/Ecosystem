@@ -1,50 +1,54 @@
 #pragma once
-#include <string>
 #include <vector>
-#include "core/Config.h"
+#include <string>
+#include "../core/Config.h"
 #include "Cell.h"
 
 namespace Ecosystem {
 
-	class IAnimal;
+    class World {
+    public:
+        explicit World(Config& cfg);
 
-	class World {
-	public :
-		explicit World(Config& config);
+        // API utilisée par main()
+        void step();
+        void print() const;
+        std::string statsLine(int turn) const;
 
-		void step();
-		void print() const;
-		std::string serialize(int turn) const;
-		
-		Cell* getCell(int x, int y);
-		const Config& cfg() const {
-			return config;
-		}
+        // Si ton main appelle encore serialize(), on expose un alias
+        std::string serialize(int turn) const;
 
-	private :
-		Config& config;
-		std::vector<Cell> grid_;
-		int turn = 0;
+        // Accès cellule
+        Cell* getCell(int x, int y);
 
-		int index (int x, int y) const {
-			return y * config.width + x;
-		}
+        // Accès config
+        const Config& cfg() const { return cfg_; }
 
-		bool inBounds(int x, int y) const {
-			return x >= 0 && x < config.width && y >= 0 && y < config.height;
-		}
 
-		void seedPlants(int n);
-		
-		void seedAnimalsGeneric(int n, std::unique_ptr<IAnimal>(*make)());
-		void seedHerbivores(int n);
-		void seedCarnivores(int n);
+    private:
 
-		void sysMove();
-		void sysFeed();
-		void sysReproduce();
-		void sysPlantsSpread();
-		void sysAgingAndStarvation();
-	};
+        
+        Config& cfg_;
+        std::vector<Cell> grid_;
+        int turn_ = 0;
 
-}
+        // utilitaires
+        int idx(int x, int y) const { return y * cfg_.width + x; }
+        bool inBounds(int x, int y) const {
+            return x >= 0 && x < cfg_.width && y >= 0 && y < cfg_.height;
+        }
+
+        // initialisation
+        void seedPlants(int n);
+        void seedHerbivores(int n);
+        void seedCarnivores(int n);
+
+        // sous-systèmes
+        void sysMove();
+        void sysFeed();
+        void sysReproduce();
+        void sysPlantsSpread();
+        void sysAgingAndStarvation();
+    };
+
+} // namespace Ecosystem

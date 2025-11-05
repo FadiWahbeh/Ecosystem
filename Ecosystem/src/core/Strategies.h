@@ -4,7 +4,7 @@
 class World;
 
 namespace Ecosystem {
-	class RandomWalk : public IMouvementStrategy {
+	class RandomWalk : public IMovementStrategy {
 	public :
 		explicit RandomWalk() = default;
 
