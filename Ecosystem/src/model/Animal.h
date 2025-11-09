@@ -4,49 +4,64 @@
 
 namespace Ecosystem {
 
-	class IMovementStrategy;
-	class IFeedingStrategy;
+    class IMovementStrategy;
+    class IFeedingStrategy;
 
-	class Animal : public IAnimal {
-	public :
-		Animal(AnimalKind k, std::unique_ptr<IMovementStrategy> m, std::unique_ptr<IFeedingStrategy> f);
+    class Animal : public IAnimal {
+    public:
+        Animal(AnimalKind k,
+            Gender g,
+            std::unique_ptr<IMovementStrategy> m,
+            std::unique_ptr<IFeedingStrategy> f);
 
-		AnimalKind kind() const override {
-			return m_kind;
-		}
+        AnimalKind kind() const override {
+            return m_kind;
+        }
 
-		void on_step_begin() override;
+        Gender gender() const override {
+            return m_gender;
+        }
 
-		bool is_Hungry() const override {
-			return m_hunger;
-		}
+        void on_step_begin() override;
 
-		int& hungery_ref() override {
-			return m_hunger;
-		}
+        bool is_Hungry() const override {
+            return m_hunger;
+        }
 
-		int& satiety_ref() override {
-			return m_satiety;
-		}
+        int& hungery_ref() override {
+            return m_hunger;
+        }
 
-		int& repro_cooldown_ref() override {
-			return m_repro_cooldown;
-		}
+        int& satiety_ref() override {
+            return m_satiety;
+        }
 
-		IMovementStrategy& movement() {
-			return *m_movement_strategy;
-		}
+        int& repro_cooldown_ref() override {
+            return m_repro_cooldown;
+        }
 
-		IFeedingStrategy& feeding() {
-			return *m_feeding_strategy;
-		}
+        int& baby_turns_ref() override {
+            return m_baby_turns;
+        }
 
-	protected :
-		AnimalKind m_kind;
-		int m_hunger = 0;
-		int m_satiety = 0;
-		int m_repro_cooldown = 0;
-		std::unique_ptr<IMovementStrategy> m_movement_strategy;
-		std::unique_ptr<IFeedingStrategy> m_feeding_strategy;
-	};
+        IMovementStrategy& movement() override {
+            return *m_movement_strategy;
+        }
+
+        IFeedingStrategy& feeding() override {
+            return *m_feeding_strategy;
+        }
+
+    protected:
+        AnimalKind m_kind;
+        Gender     m_gender;
+
+        int m_hunger = 0;
+        int m_satiety = 0;
+        int m_repro_cooldown = 0;
+        int m_baby_turns = 0;
+
+        std::unique_ptr<IMovementStrategy> m_movement_strategy;
+        std::unique_ptr<IFeedingStrategy>  m_feeding_strategy;
+    };
 }
