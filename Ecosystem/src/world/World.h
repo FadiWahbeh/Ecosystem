@@ -15,8 +15,7 @@ namespace Ecosystem {
         std::string statsLine(int turn) const;
         std::string serialize(int turn) const;
 
-        void debugPrintAnimalAt(int x, int y) const;
-
+        void debugPrintCell(int x, int y) const;
 
         Cell* getCell(int x, int y);
         const Cell* getCell(int x, int y) const;
@@ -43,6 +42,8 @@ namespace Ecosystem {
         void sysAgingAndStarvation();
 
         char charForCell(const Cell& c) const;
+
+        const char* color_for_char(char ch) const;
     };
 
 }

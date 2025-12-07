@@ -1,6 +1,7 @@
 #include "World.h"
 #include "./factory/EntityFactory.h"
 #include "./core/Strategies.h"
+#include "core/ConsoleColor.h"
 #include <iostream>
 #include <array>
 #include <cstdlib>
@@ -40,25 +41,47 @@ namespace Ecosystem {
 	}
 
     void World::seedPlants(int n) {
-        for (int i = 0; i < n; i++) {
+
+        int totalCells = cfg_.width * cfg_.height;
+        int maxPlants = (totalCells * cfg_.max_plant_percent) / 100;
+        n = std::min(n, maxPlants);
+
+        int planted = 0;
+		int guard = n * 20 + 1000;
+
+        while (planted < n && guard--) {
             int x = std::rand() % cfg_.width;
             int y = std::rand() % cfg_.height;
             auto& c = grid_[idx(x, y)];
-            if (!c.plant) c.plant = EntityFactory::makePlant();
-        }
+            if (!c.plant) {
+                c.plant = EntityFactory::makePlant();
+                planted++;
+            }
+		}
     }
 
+
     void World::seedHerbivores(int n) {
+        int maxAllowed = cfg_.width * cfg_.height * cfg_.max_herbivore_percent;
+		if (n > maxAllowed) n = maxAllowed;
+
         int placed = 0, guard = n * 20 + 1000;
         while (placed < n && guard--) {
             int x = std::rand() % cfg_.width;
             int y = std::rand() % cfg_.height;
             auto& c = grid_[idx(x, y)];
-            if (!c.animal) { c.animal = EntityFactory::makeHerbivore(); placed++; }
+            if (!c.animal) { 
+                c.animal = EntityFactory::makeHerbivore();
+                placed++; 
+            }
         }
     }
 
     void World::seedCarnivores(int n) {
+
+        int maxAllowed = cfg_.width * cfg_.height * cfg_.max_carnivore_percent;
+        if (n > maxAllowed) n = maxAllowed;
+
         int placed = 0, guard = n * 20 + 1000;
         while (placed < n && guard--) {
             int x = std::rand() % cfg_.width;
@@ -261,138 +284,177 @@ namespace Ecosystem {
         return statsLine(turn);
     }
 
+    const char* World::color_for_char(char ch) const{
+        switch (ch) {
+        case '*': return GREEN;
+        case 'h': return CYAN;
+        case 'H': return BLUE;
+        case 'm': return LightRed;
+        case 'f': return BRIGHT_BLACK;
+        case 'c': return RED;
+        case 'C': return MAGENTA;
+        case 'M': return LightRed;
+        case 'F': return WHITE;
+        default: return RESET;
+        }
+    }
+
+    char World::charForCell(const Cell& c) const {
+
+        if (!c.plant && !c.animal) {
+            return '.';
+        }
+
+        if (c.animal) {
+            auto& a = *c.animal;
+            bool isBaby = (a.baby_turns_ref() > 0);
+            bool isMale = (a.gender() == Gender::Male);
+
+            if (a.kind() == AnimalKind::Herbivore) {
+                if (isBaby) {
+                    return isMale ? 'm' : 'f';
+                }
+                return isMale ? 'h' : 'H';
+            }
+            else {
+                if (isBaby) {
+                    return isMale ? 'M' : 'F';
+                }
+                return isMale ? 'c' : 'C';
+            }
+        }
+
+        if (c.plant) {
+            return '*';
+        }
+
+        return '.';
+    }
+
     void World::print(int debugX, int debugY) const {
         for (int y = 0; y < cfg_.height; ++y) {
             for (int x = 0; x < cfg_.width; ++x) {
-                auto const& c = grid_[idx(x, y)];
+                const Cell& c = grid_[idx(x, y)];
+                char ch = charForCell(c);
+                const char* col = color_for_char(ch);
 
-                char plantCh = c.plant ? '*' : '.';
+                bool isDebug = (x == debugX && y == debugY);
 
-                char animalCh = '.';
-                if (c.animal) {
-                    auto& a = *c.animal;
-                    bool isBaby = (a.baby_turns_ref() > 0);
-                    bool isMale = (a.gender() == Gender::Male);
-
-                    if (a.kind() == AnimalKind::Herbivore) {
-                        if (isBaby) {
-                            animalCh = isMale ? 'm' : 'f';
-                        }
-                        else {
-                            animalCh = isMale ? 'h' : 'H';
-                        }
-                    }
-                    else {
-                        if (isBaby) {
-                            animalCh = isMale ? 'M' : 'F';
-                        }
-                        else {
-                            animalCh = isMale ? 'c' : 'C';
-                        }
-                    }
-                }
-
-                if (x == debugX && y == debugY) {
-                    char mark1 = 'X';
-                    char mark2 = '.';
-
-                    if (c.animal) {
-                        mark2 = animalCh;
-                    }
-                    else if (c.plant) {
-                        mark2 = '*';
-                    }
-
-                    std::cout << mark1 << mark2;
+                if (isDebug) {
+                    std::cout << '[' << col << ch << RESET << ']';
                 }
                 else {
-                    std::cout << plantCh << animalCh;
+                    std::cout << col << ch << RESET;
                 }
             }
             std::cout << '\n';
         }
 
-        std::cout << "\n";
+        std::cout << "\nLegende :\n"
+            << "  " << color_for_char('*') << "*" << RESET << " = plante\n"
+            << "  " << color_for_char('h') << "h" << RESET << " = herbivore adulte male\n"
+            << "  " << color_for_char('H') << "H" << RESET << " = herbivore adulte femelle\n"
+            << "  " << color_for_char('m') << "m" << RESET << " = baby herbivore male\n"
+            << "  " << color_for_char('f') << "f" << RESET << " = baby herbivore femelle\n"
+            << "  " << color_for_char('c') << "c" << RESET << " = carnivore adulte male\n"
+            << "  " << color_for_char('C') << "C" << RESET << " = carnivore adulte femelle\n"
+            << "  " << color_for_char('M') << "M" << RESET << " = baby carnivore male\n"
+            << "  " << color_for_char('F') << "F" << RESET << " = baby carnivore femelle\n"
+            << "  " << color_for_char('.') << "." << RESET << " = vide\n\n";
+
+
     }
-
-    /*void World::print() const {
-        for (int y = 0; y < cfg_.height; ++y) {
-            for (int x = 0; x < cfg_.width; ++x) {
-                auto const& c = grid_[idx(x, y)];
-
-                // 1er caractère : plante ou pas
-                char plantCh = c.plant ? '*' : '.';
-
-                // 2e caractère : animal / genre / bébé
-                char animalCh = '.';
-                if (c.animal) {
-                    auto& a = *c.animal;
-                    bool isBaby = (a.baby_turns_ref() > 0);
-
-                    if (a.kind() == AnimalKind::Herbivore) {
-                        if (isBaby) {
-                            animalCh = 'b';           // bébé herbivore
-                        }
-                        else {
-                            animalCh = (a.gender() == Gender::Male ? 'h' : 'H');
-                        }
-                    }
-                    else { // Carnivore
-                        if (isBaby) {
-                            animalCh = 'B';           // bébé carnivore
-                        }
-                        else {
-                            animalCh = (a.gender() == Gender::Male ? 'c' : 'C');
-                        }
-                    }
-                }
-
-                std::cout << plantCh << animalCh;
-            }
-            std::cout << '\n';
-        }
-
-        std::cout << "\n";
-    }*/
 
     std::string World::statsLine(int turn) const {
-        int plants = 0, herb = 0, carn = 0;
+        int plants = 0;
+        int herbTotal = 0, carnTotal = 0;
+
+        int babyHerbMale = 0;
+        int babyHerbFemale = 0;
+        int babyCarnMale = 0;
+        int babyCarnFemale = 0;
+
         for (auto const& c : grid_) {
-            if (c.plant) plants++;
-            if (c.animal) (c.animal->kind() == AnimalKind::Herbivore ? herb++ : carn++);
+            if (c.plant) {
+                plants++;
+            }
+            if (c.animal) {
+                auto& a = *c.animal;
+                bool isBaby = (a.baby_turns_ref() > 0);
+                bool isMale = (a.gender() == Gender::Male);
+
+                if (a.kind() == AnimalKind::Herbivore) {
+                    herbTotal++;
+                    if (isBaby) {
+                        if (isMale) babyHerbMale++;
+                        else        babyHerbFemale++;
+                    }
+                }
+                else {
+                    carnTotal++;
+                    if (isBaby) {
+                        if (isMale) babyCarnMale++;
+                        else        babyCarnFemale++;
+                    }
+                }
+            }
         }
-        return "Turn " + std::to_string(turn) +
+
+        std::string s = "Turn " + std::to_string(turn) +
             " | Plants=" + std::to_string(plants) +
-            " Herb=" + std::to_string(herb) +
-            " Carn=" + std::to_string(carn);
+            " Herb=" + std::to_string(herbTotal) +
+            " (baby hm=" + std::to_string(babyHerbMale) +
+            ", hf=" + std::to_string(babyHerbFemale) + ")" +
+            " Carn=" + std::to_string(carnTotal) +
+            " (baby cm=" + std::to_string(babyCarnMale) +
+            ", cf=" + std::to_string(babyCarnFemale) + ")";
+
+        return s;
     }
 
-    void World::debugPrintAnimalAt(int x, int y) const {
+    void World::debugPrintCell(int x, int y) const {
         if (!inBounds(x, y)) {
-            std::cout << "Debug: (" << x << "," << y << ") est hors de la grille\n";
+            std::cout << "(" << x << "," << y << ") est hors de la grille\n";
+            std::cout << "------------------------------------------------------------\n\n";
             return;
         }
 
         auto const& cell = grid_[idx(x, y)];
-        if (!cell.animal) {
-            std::cout << "Debug: aucun animal à (" << x << "," << y << ")\n";
+
+        std::cout << "Cellule (" << x << "," << y << ") :\n";
+
+        if (!cell.plant && !cell.animal) {
+            std::cout << " vide\n";
+            std::cout << "------------------------------------------------------------\n\n";
             return;
         }
 
-        auto& a = *cell.animal;
+        if (cell.plant) {
+            std::cout << "  Plante presente" << "\n";
+        }
 
-        std::string kindStr =
-            (a.kind() == AnimalKind::Herbivore ? "Herbivore" : "Carnivore");
-        std::string genderStr =
-            (a.gender() == Gender::Male ? "Male" : "Female");
+        if (cell.animal) {
+            auto& a = *cell.animal;
 
-        std::cout << "Debug animal @(" << x << "," << y << ") : "
-            << kindStr << " " << genderStr
-            << " | hunger=" << a.hungery_ref()
-            << " | satiety=" << a.satiety_ref()
-            << " | baby_turns=" << a.baby_turns_ref()
-            << " | repro_cd=" << a.repro_cooldown_ref()
-            << "\n";
+            std::string kindStr =
+                (a.kind() == AnimalKind::Herbivore ? "Herbivore" : "Carnivore");
+            std::string genderStr =
+                (a.gender() == Gender::Male ? "Male" : "Female");
+
+            bool isBaby = (a.baby_turns_ref() > 0);
+
+            std::cout << "  Animal : " << kindStr
+                << " | sexe=" << genderStr
+                << " | baby=" << (isBaby ? "oui" : "non")
+                << " | hunger=" << a.hungery_ref()
+                << " | satiety=" << a.satiety_ref()
+                << " | repro_cd=" << a.repro_cooldown_ref()
+                << " | baby_turns=" << a.baby_turns_ref()
+                << "\n";
+        }
+
+        std::cout << "------------------------------------------------------------\n\n";
     }
 
-} // namespace Ecosystem
+
+}

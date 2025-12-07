@@ -44,44 +44,6 @@ std::ofstream createLogFile() {
     return logFile;
 }
 
-/*int main() {
-    using namespace Ecosystem;
-    auto& cfg = Config::I();
-    World world(cfg);
-
-    const int maxTurns = 4;*/
-    /*for (int t = 0; t < maxTurns; ++t) {
-        std::cout << world.statsLine(t) << "\n";
-        world.print();
-        world.step();
-    }
-
-    for (int t = 0; t < maxTurns; ++t) {
-        std::cout << world.statsLine(t) << "\n";
-        world.print();
-
-        // choisis une case à observer, par ex (10, 5)
-        world.debugPrintAnimalAt(5, 5);
-        world.debugPrintAnimalAt(10, 10);
-        world.debugPrintAnimalAt(10, 15);
-        world.debugPrintAnimalAt(15, 15);
-        world.debugPrintAnimalAt(20, 10);
-
-        world.step();
-    }*/
-/*
-    int dbgX = 10;
-    int dbgY = 10;
-
-    for (int t = 0; t < maxTurns; ++t) {
-        std::cout << world.statsLine(t) << "\n";
-        world.print(dbgX, dbgY);           // met un X sur la case (10,10)
-        world.debugPrintAnimalAt(dbgX, dbgY);
-
-        world.step();
-    }
-}*/
-
 int main() {
     using namespace Ecosystem;
 
@@ -117,7 +79,7 @@ int main() {
         {
             std::stringstream buf;
             std::streambuf* oldCout = std::cout.rdbuf(buf.rdbuf());
-            world.debugPrintAnimalAt(dbgX, dbgY);
+            world.debugPrintCell(dbgX, dbgY);
             std::cout.rdbuf(oldCout);
             dbg << buf.str();
         }

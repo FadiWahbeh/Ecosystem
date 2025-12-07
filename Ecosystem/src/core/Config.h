@@ -11,19 +11,21 @@ namespace Ecosystem {
             return inst;
         }
 
-        int width = 40;
-        int height = 20;
+        int width = 20;
+        int height = 15;
 
-        int initial_plants = 250;
-        int initial_herbivores = 40;
-        int initial_carnivores = 25;
+        int initial_plants = 80;
+        int initial_herbivores = 30;
+        int initial_carnivores = 30;
 
         int plant_spread_period = 3;
         int repro_cool_down = 4;
         int satiety_after_eat = 3;
         int starvation_limit = 8;
         int plant_spread_chance_percent = 30;
-        int max_plant_percent = 60;
+        int max_plant_percent = 40;
+		int max_carnivore_percent = 30;
+		int max_herbivore_percent = 30;
 
         int baby_stay_turns = 3;
 

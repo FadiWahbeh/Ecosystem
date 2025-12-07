@@ -14,43 +14,27 @@ namespace Ecosystem {
             std::unique_ptr<IMovementStrategy> m,
             std::unique_ptr<IFeedingStrategy> f);
 
-        AnimalKind kind() const override {
-            return m_kind;
-        }
+		~Animal() override = default;
 
-        Gender gender() const override {
-            return m_gender;
-        }
+        AnimalKind kind() const override;
+
+        Gender gender() const override;
 
         void on_step_begin() override;
 
-        bool is_Hungry() const override {
-            return m_hunger;
-        }
+        bool is_Hungry() const override;
 
-        int& hungery_ref() override {
-            return m_hunger;
-        }
+        int& hungery_ref() override;
 
-        int& satiety_ref() override {
-            return m_satiety;
-        }
+        int& satiety_ref() override;
 
-        int& repro_cooldown_ref() override {
-            return m_repro_cooldown;
-        }
+        int& repro_cooldown_ref() override;
 
-        int& baby_turns_ref() override {
-            return m_baby_turns;
-        }
+        int& baby_turns_ref() override;
 
-        IMovementStrategy& movement() override {
-            return *m_movement_strategy;
-        }
+        IMovementStrategy& movement() override;
 
-        IFeedingStrategy& feeding() override {
-            return *m_feeding_strategy;
-        }
+        IFeedingStrategy& feeding() override;
 
     protected:
         AnimalKind m_kind;

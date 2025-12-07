@@ -9,8 +9,6 @@
 
 namespace Ecosystem {
 
-    // RandomWalk
-
     Position RandomWalk::choose_next(const World& world, int x, int y) {
         static const std::array<std::pair<int, int>, 4> directions{ {
             {  1,  0},
