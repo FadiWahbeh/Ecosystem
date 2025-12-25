@@ -58,6 +58,7 @@ int main() {
     int dbgY = 10;
 
     for (int t = 0; t < maxTurns; ++t) {
+        system("cls");
         std::ostringstream frame;
         frame << world.statsLine(t) << "\n";
         std::cout << frame.str();
@@ -88,6 +89,8 @@ int main() {
         log << dbg.str();
 
         world.step();
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
 
     std::cout << "\n Simulation terminée. Résultats enregistrés.\n";
