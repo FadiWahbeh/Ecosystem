@@ -1,4 +1,4 @@
-#include "World.h"
+ï»¿#include "World.h"
 #include "./factory/EntityFactory.h"
 #include "./core/Strategies.h"
 #include "core/ConsoleColor.h"
@@ -38,7 +38,7 @@ namespace Ecosystem {
     const Cell* World::getCell(int x, int y) const {
         if (!inBounds(x, y)) return nullptr;
         return &grid_[idx(x, y)];
-	}
+    }
 
     void World::seedPlants(int n) {
 
@@ -47,7 +47,7 @@ namespace Ecosystem {
         n = std::min(n, maxPlants);
 
         int planted = 0;
-		int guard = n * 20 + 1000;
+        int guard = n * 20 + 1000;
 
         while (planted < n && guard--) {
             int x = std::rand() % cfg_.width;
@@ -57,22 +57,22 @@ namespace Ecosystem {
                 c.plant = EntityFactory::makePlant();
                 planted++;
             }
-		}
+        }
     }
 
 
     void World::seedHerbivores(int n) {
         int maxAllowed = cfg_.width * cfg_.height * cfg_.max_herbivore_percent;
-		if (n > maxAllowed) n = maxAllowed;
+        if (n > maxAllowed) n = maxAllowed;
 
         int placed = 0, guard = n * 20 + 1000;
         while (placed < n && guard--) {
             int x = std::rand() % cfg_.width;
             int y = std::rand() % cfg_.height;
             auto& c = grid_[idx(x, y)];
-            if (!c.animal) { 
+            if (!c.animal) {
                 c.animal = EntityFactory::makeHerbivore();
-                placed++; 
+                placed++;
             }
         }
     }
@@ -91,7 +91,7 @@ namespace Ecosystem {
         }
     }
 
-    // Déplacements
+    // Dï¿½placements
 
     void World::sysMove() {
         struct Move { int x, y, nx, ny; };
@@ -284,7 +284,7 @@ namespace Ecosystem {
         return statsLine(turn);
     }
 
-    const char* World::color_for_char(char ch) const{
+    const char* World::color_for_char(char ch) const {
         switch (ch) {
         case '*': return GREEN;
         case 'h': return CYAN;
